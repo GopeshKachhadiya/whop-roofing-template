@@ -1,0 +1,46 @@
+{
+  "currency": "usd",
+  "offers": [
+    {
+      "key": "inspection",
+      "kind": "service",
+      "sku": "NGR-INSPECT",
+      "productTitle": "Roof Inspection",
+      "productHeadline": "Drone + on-roof inspection with a written report",
+      "productDescription": "A licensed inspector walks the roof, checks decking, flashing, vents and attic ventilation, and sends a photo report with a written estimate. The fee is credited toward any repair or replacement.",
+      "planTitle": "Roof inspection",
+      "planDescription": "One-time fee. Credited toward any repair or replacement.",
+      "price": 149
+    },
+    {
+      "key": "deposit",
+      "kind": "deposit",
+      "sku": "NGR-DEPOSIT",
+      "productTitle": "Project Deposit",
+      "productHeadline": "Reserve your install date",
+      "productDescription": "Holds your crew and install date and orders materials. The deposit is applied to your final invoice. Your card stays on file so the remaining balance can be billed when the job is signed off.",
+      "planTitle": "Project deposit",
+      "planDescription": "Applied to your final invoice.",
+      "price": 500
+    },
+    {
+      "key": "tuneup",
+      "kind": "service",
+      "sku": "NGR-TUNEUP",
+      "productTitle": "Roof Tune-Up (Flat Rate)",
+      "productHeadline": "One visit, one price, most small leaks fixed",
+      "productDescription": "Flat-rate repair visit: reseal flashings and pipe boots, replace up to 10 damaged shingles, reset popped nails, clear valleys and gutters at the roofline. Includes a 1-year leak warranty on the areas we touch.",
+      "planTitle": "Roof tune-up",
+      "planDescription": "Flat rate. Up to 10 shingles, flashings resealed.",
+      "price": 389
+    },
+    {
+      "key": "balance",
+      "kind": "balance",
+      "sku": "NGR-BALANCE",
+      "productTitle": "Final Balance",
+      "productHeadline": "Remaining balance on a completed roofing job",
+      "productDescription": "The remaining balance for your completed roofing project, billed after final walkthrough. Your deposit has already been applied."
+    }
+  ]
+}

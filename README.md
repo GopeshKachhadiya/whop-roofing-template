@@ -1,196 +1,130 @@
-Welcome to your new TanStack Start app!
+# Roofing website template for Whop
 
-# Getting Started
+A complete site for a US roofing company, hosted on Whop Websites. It covers the whole money path of a roofing job: inspection fee, project deposit with the card kept on file, and a final invoice for the balance.
 
-To run this application:
+Northgable Roofing is a made-up company. Replace its reviews and credentials with real ones before showing the site to customers.
+
+## Make it yours
+
+Nothing structural changes when you swap the company.
+
+| To change | Edit |
+| - | - |
+| Name, phone, hours, services, service area, reviews, all page copy | `src/config/site.ts` |
+| Prices and what each plan is called | `src/config/offers.json`, then `pnpm whop:sync` |
+| Colors and type | the `@theme` block and the `.theme-sage` / `.theme-bone` tokens in `src/styles.css` |
+
+To set up a new business:
+
+```bash
+whop login
+```
+
+```bash
+whop apps init --app_type website --name "Acme Roofing" --domain acme-roofing --template <this app's id>
+```
+
+```bash
+rm src/config/whop.generated.json && pnpm whop:sync
+```
+
+```bash
+whop apps secrets set --secret OFFICE_PASSCODE=choose-a-long-passcode
+```
+
+```bash
+whop apps deploy
+```
+
+## How each Whop feature is used
+
+| Feature | Where |
+| - | - |
+| Hosting and deploys | `whop apps deploy`, with the `whop()` Vite plugin |
+| Products and plans | `scripts/whop-sync.mjs` creates them from `offers.json` |
+| `ExpressCheckoutElement` | `src/routes/checkout.$offer.tsx`, for fixed-price services |
+| `PaymentElement`, `EmailElement`, `BrandingElement` | `src/components/checkout/PayForms.tsx` |
+| Leads API | `src/server/estimate.functions.ts` |
+| Setup intent (card on file) | `saveCard` in `src/server/checkout.functions.ts` |
+| Deposit charged to the saved card | `chargeDeposit` in the same file |
+| Invoices API | `billBalance` in `src/server/office.functions.ts`, used from `/office` |
+| Pixel | `src/lib/track.ts` |
+
+Card numbers only ever go into Whop's hosted fields. The server charges plan IDs it looks up itself, so the browser can't set a price.
+
+### The job flow
+
+1. A homeowner requests an estimate. The form creates a Whop lead.
+2. They book an inspection or pay a deposit at `/checkout/<offer>`. The deposit first saves the card with a setup intent, then charges the deposit plan to that card.
+3. After the walkthrough, staff open `/office`, enter the balance and pick how to collect it:
+   - **Charge the card on file**: creates the invoice with `payment_method_id` and issues it.
+   - **Email the invoice**: sends it, and the customer pays on Whop's checkout.
+
+Pay-over-time methods such as Klarna, Afterpay and Splitit appear inside the Whop elements once the account is approved for them. No code is needed.
+
+### Estimate form and Whop users
+
+`POST /leads` needs a Whop `user_id`, and a homeowner only has an email. The form first matches an earlier lead or an existing member. For a new contact it creates a draft invoice with `email_address`, which finds or creates the user, then voids that draft straight away. It charges and emails nothing, but each new contact uses up one invoice number.
+
+### Pixel events
+
+| Event | Fires when |
+| - | - |
+| `service_viewed` | the services section comes into view, or a service is picked |
+| `estimate_requested` | a lead has been created |
+| `deposit_started` | the deposit checkout opens |
+| `view_content`, `lead`, `initiate_checkout` | the standard events alongside those |
+
+Add `?pixel=debug` to any URL to see events as they fire. They also appear in the Whop pixel dashboard about a minute later.
+
+## Deploy to Vercel
+
+The same code also runs on Vercel. Vercel sets `VERCEL=1` during its build, which switches the build to a Nitro server (see `vite.config.ts`), and `vercel.json` already sets the build command.
+
+1. Import this repository in Vercel. No framework preset or build settings are needed.
+2. Add the environment variables from `.env.example`. On Vercel, `WHOP_API_KEY` is required: it's a company API key from https://whop.com/dashboard/developer. Whop hosting provides one automatically; other hosts don't.
+3. Deploy.
+
+The Whop pixel is added automatically on hosts other than Whop, so the custom events still reach your Whop dashboard. For Apple Pay and Google Pay buttons, register the Vercel domain once:
+
+```bash
+whop domains create your-site.vercel.app --apple_pay '{}'
+```
+
+`vercel.json` already serves the Apple Pay verification file Whop asks for.
+
+To test a production build locally on Node:
+
+```bash
+pnpm build:node && pnpm start:node
+```
+
+## Test mode
+
+`?mode=test` runs checkout against Whop's sandbox, where no money moves. It needs a one-time setup with a key from [sandbox.whop.com](https://sandbox.whop.com/dashboard/developer):
+
+```bash
+WHOP_SANDBOX_API_KEY=your_key pnpm whop:sync --sandbox
+```
+
+```bash
+whop apps secrets set --secret WHOP_SANDBOX_API_KEY=your_key
+```
+
+```bash
+whop apps deploy
+```
+
+Then open `/checkout/deposit?mode=test` and pay with card `4242 4242 4242 4242`, any future date and any CVC. The job desk works in test mode too, at `/office?mode=test`, once the sandbox business has completed Whop's account verification; Whop refuses to issue invoices before that.
+
+## Develop
 
 ```bash
 pnpm install
-pnpm dev
 ```
-
-# Building For Production
-
-To build this application for production:
 
 ```bash
-pnpm build
+whop apps dev
 ```
 
-## Styling
-
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
-
-### Removing Tailwind CSS
-
-If you prefer not to use Tailwind CSS:
-
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Remove `@tailwindcss/vite` and `tailwindcss` from `package.json`
-
-
-## Deploy to Cloudflare Workers
-
-This project uses the Cloudflare Vite plugin (configured in `vite.config.ts`) and `wrangler.jsonc`:
-
-1. Install Wrangler: `npm install -g wrangler`
-2. Authenticate: `wrangler login`
-3. Deploy: `npx wrangler deploy`
-
-For production env vars, run `wrangler secret put MY_VAR` for each secret listed in `.env.example`. Public (non-secret) vars go in `wrangler.jsonc` under `vars`.
-
-KV, D1, R2, and Durable Object bindings are configured in `wrangler.jsonc` — see https://developers.cloudflare.com/workers/wrangler/configuration/.
-
-
-
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+Built with TanStack Start, React, Tailwind, three.js and Motion. The 3D roof is drawn from primitives and procedural textures, so there are no model files. It falls back to a flat drawing without WebGL and holds still under reduced-motion settings. The sky behind it follows the local time set in `site.ts`; add `?sky=morning`, `day`, `dusk` or `night` to preview one.

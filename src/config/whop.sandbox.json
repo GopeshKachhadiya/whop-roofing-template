@@ -1,0 +1,31 @@
+{
+  "accountId": "biz_A63sbgrFwyEtCZ",
+  "currency": "usd",
+  "offers": {
+    "inspection": {
+      "productId": "prod_DixZph8Bkw0Vg",
+      "planId": "plan_axoBvw27ezfwf",
+      "price": 149,
+      "planTitle": "Roof inspection",
+      "kind": "service"
+    },
+    "deposit": {
+      "productId": "prod_9FaruoEokMVFf",
+      "planId": "plan_4DoeqEeQJI2CB",
+      "price": 500,
+      "planTitle": "Project deposit",
+      "kind": "deposit"
+    },
+    "tuneup": {
+      "productId": "prod_uYdFbCKig1aPv",
+      "planId": "plan_tU33oJX7r1gsM",
+      "price": 389,
+      "planTitle": "Roof tune-up",
+      "kind": "service"
+    },
+    "balance": {
+      "productId": "prod_nNdC3OCA7OsU5",
+      "kind": "balance"
+    }
+  }
+}

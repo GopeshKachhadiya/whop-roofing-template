@@ -1,17 +1,494 @@
-
 @import "tailwindcss";
+@import "@fontsource-variable/space-grotesk/index.css";
+@import "@fontsource-variable/figtree/index.css";
+@import "@fontsource-variable/jetbrains-mono/index.css";
 
-* {
-  box-sizing: border-box;
+/*
+  Design tokens. The page is built from three surfaces: near-black (default),
+  sage and bone. Add .theme-sage or .theme-bone to a section and every token
+  inside it follows. One hot orange does all the pointing.
+*/
+@theme {
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-page: #0d0d0c;
+  --color-surface: #161614;
+  --color-raised: #201f1d;
+  --color-ink: #eeece7;
+  --color-ink-soft: #a8a59e;
+  --color-line: #2f2e2b;
+  --color-line-strong: #5a5852;
+  --color-accent: #ff6a33;
+  --color-accent-wash: #33190e;
+  --color-brand: #ff4500;
+  --color-brand-deep: #e83f00;
+  --color-on-brand: #0d0d0c;
+  --color-slate: #0d0d0c;
+  --color-on-slate: #eeece7;
+  --color-on-slate-soft: #a8a59e;
+  --color-slate-line: #2f2e2b;
+  --color-danger: #ff9d8f;
+  --color-danger-wash: #3d1a15;
+  --color-ok: #bafe02;
+  --color-ok-wash: #222d08;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-html,
-body,
-#app {
-  min-height: 100%;
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  .theme-sage,
+  .theme-bone {
+    color-scheme: light;
+    background: var(--color-page);
+    color: var(--color-ink);
+  }
+
+  .theme-sage {
+    --color-page: #b8c0a5;
+    --color-surface: #c7cdb6;
+    --color-raised: #e2e6de;
+    --color-ink: #182113;
+    --color-ink-soft: #3c4733;
+    --color-line: #98a287;
+    --color-line-strong: #5f6b52;
+    --color-accent: #8a2700;
+    --color-accent-wash: #e6c9b4;
+    --color-danger: #8f1c12;
+    --color-danger-wash: #f0d3cb;
+    --color-ok: #24510f;
+    --color-ok-wash: #d3e3b4;
+  }
+
+  .theme-bone {
+    --color-page: #dbdecd;
+    --color-surface: #e6e8db;
+    --color-raised: #f7f6f0;
+    --color-ink: #182113;
+    --color-ink-soft: #454f3b;
+    --color-line: #b4baa3;
+    --color-line-strong: #6d7760;
+    --color-accent: #a32e00;
+    --color-accent-wash: #f2d9c7;
+    --color-danger: #93190f;
+    --color-danger-wash: #f6dbd5;
+    --color-ok: #24510f;
+    --color-ok-wash: #d8e7ba;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-weight: inherit;
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  button,
+  [role="tab"],
+  summary,
+  label[for],
+  select {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
-body {
-  margin: 0;
+@layer components {
+  /* Type roles: Space Grotesk for signage, Figtree for reading, mono for labels. */
+  .type-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(3.25rem, 1rem + 8.1vw, 8rem);
+    line-height: 0.86;
+    letter-spacing: -0.06em;
+    text-transform: uppercase;
+  }
+
+  .type-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.25rem, 1.2rem + 3.9vw, 5rem);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+  }
+
+  .type-heading {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.3125rem, 1.15rem + 0.6vw, 1.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .type-lede {
+    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+    line-height: 1.45;
+    color: var(--color-ink-soft);
+  }
+
+  .type-note {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .type-figure {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 90rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 2.6vw, 2.5rem);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.9688rem;
+    line-height: 1.1;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 180ms var(--ease-out-quart),
+      border-color 180ms var(--ease-out-quart),
+      box-shadow 240ms var(--ease-out-quart),
+      color 180ms var(--ease-out-quart),
+      transform 180ms var(--ease-out-quart);
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .btn:active:not(:disabled) {
+    transform: translateY(1px) scale(0.985);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+  }
+
+  .btn-primary {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.28),
+      0 8px 26px -8px rgb(255 69 0 / 0.65);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: #ff5a1f;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.32),
+      0 12px 34px -8px rgb(255 69 0 / 0.85);
+  }
+
+  .btn-quiet {
+    background: color-mix(in srgb, var(--color-ink) 5%, transparent);
+    color: var(--color-ink);
+    border-color: var(--color-line-strong);
+  }
+
+  .btn-quiet:hover:not(:disabled) {
+    border-color: var(--color-ink);
+    background: color-mix(in srgb, var(--color-ink) 10%, transparent);
+  }
+
+  .link {
+    color: var(--color-accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+  }
+
+  .link:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3125rem 0.75rem;
+    border-radius: 999px;
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .panel {
+    border-radius: 24px;
+    border: 1px solid var(--color-line);
+    background: var(--color-raised);
+  }
+
+  .field {
+    display: grid;
+    gap: 0.375rem;
+  }
+
+  .field-label {
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  .field-input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 12px;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font: inherit;
+    font-size: 1rem;
+    transition:
+      border-color 140ms var(--ease-out-quart),
+      box-shadow 140ms var(--ease-out-quart);
+  }
+
+  .field-input::placeholder {
+    color: var(--color-ink-soft);
+  }
+
+  .field-input:hover {
+    border-color: var(--color-ink-soft);
+  }
+
+  .field-input:focus-visible {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  }
+
+  .field-input[aria-invalid="true"] {
+    border-color: var(--color-danger);
+  }
+
+  .field-error {
+    color: var(--color-danger);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .field-hint {
+    color: var(--color-ink-soft);
+    font-size: 0.875rem;
+  }
+
+  /* Names for the lifted layers of the 3D roof. The scene sets each one's
+     position and `--lead`, the length of its line. */
+  .roof-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .roof-label::before {
+    content: "";
+    flex: none;
+    width: var(--lead, 2.75rem);
+    height: 1px;
+    background: rgb(255 255 255 / 0.75);
+  }
+
+  .roof-label > span {
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    background: rgb(13 13 12 / 0.78);
+    color: #eeece7;
+    transition:
+      background-color 200ms var(--ease-out-quart),
+      color 200ms var(--ease-out-quart);
+  }
+
+  .roof-label[data-active="true"] > span {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+  }
+
+  /* A headline line that slides up from behind its own baseline on load. */
+  .line-mask {
+    display: block;
+    overflow: hidden;
+    padding-block: 0.06em;
+    margin-block: -0.06em;
+  }
+
+  .line-mask > span {
+    display: block;
+    animation: line-up 1100ms var(--ease-out-expo) both;
+  }
+
+  .marquee {
+    display: flex;
+    width: max-content;
+    animation: marquee 38s linear infinite;
+  }
+
+  .marquee-holder:hover .marquee {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      animation: none;
+    }
+  }
 }
 
+@keyframes line-up {
+  from {
+    transform: translateY(108%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-rise {
+  animation: rise-in 800ms var(--ease-out-expo) both;
+}
+
+.animate-panel {
+  animation: panel-in 320ms var(--ease-out-quart) both;
+}
+
+.animate-spin-slow {
+  animation: spin 900ms linear infinite;
+}
